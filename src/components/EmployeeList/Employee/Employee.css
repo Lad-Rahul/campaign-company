@@ -1,0 +1,31 @@
+.EmployeeItem{
+    display: flex;
+    box-sizing: border-box;
+    padding:0.8rem;
+    border-bottom: 1px solid black;
+}
+
+.LiFirstName{
+    flex:3;
+    text-align: left;
+}
+
+.LiLastName{
+    flex:3;
+    text-align: left;
+}
+
+.LiEmail{
+    flex:6;
+    text-align: left;
+}
+
+.LiAvatar{
+    flex:4;
+    text-align:left;
+}
+
+.LiActionEmp{
+    flex:3;
+    text-align:left;
+}

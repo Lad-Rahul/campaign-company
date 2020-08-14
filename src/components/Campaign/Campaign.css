@@ -1,0 +1,36 @@
+.CampaignItem{
+    display: flex;
+    box-sizing: border-box;
+    padding:0.8rem;
+    border-bottom: 1px solid black;
+}
+
+.LiCheckbox{
+    flex:2;
+    text-align: left;
+}
+
+.LiName{
+    flex:4;
+    text-align: left;
+}
+
+.LiType{
+    flex:6;
+    text-align: left;
+}
+
+.LiTime{
+    flex:6;
+    text-align: left;
+}
+
+.LiAction{
+    flex:2;
+    text-align: left;
+}
+
+.LiImg{
+    width:100px;
+    height:100px;
+}

@@ -1,0 +1,15 @@
+
+.PageNo{
+    padding:0.5rem;
+    /* margin:1rem; */
+    border: 1px solid black;
+    list-style-type: none;
+    display: inline;
+    margin: 0.2rem;
+    border-radius: 4px;
+}
+.ActiveNo{
+    font-weight: bold;
+    background-color: cyan;
+    border-radius: 4px;
+}
