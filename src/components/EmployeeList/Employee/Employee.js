@@ -2,8 +2,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import './Employee.css';
-import { editImg } from '../../../assets/image/edit_image.png';
-import { deleteImg } from '../../../assets/image/delete_image.png';
+import editImg from '../../../assets/image/edit_image.png';
+import deleteImg from '../../../assets/image/delete_image.png';
 
 class Employee extends PureComponent {
     onClickDelete = () => {
@@ -23,8 +23,8 @@ class Employee extends PureComponent {
       <span className="LiEmail">{email}</span>
       <span className="LiAvatar"><img src={avatar} alt={first_name} /></span>
       <span className="LiAction">
-        <img className="LiImg" src={editImg} alt="Edit" onClick={this.onClickEdit} />
-        <img className="LiImg" src={deleteImg} alt="Delete" onClick={this.onClickDelete} />
+        <img className="LiImgEmp" src={editImg} alt="Edit" onClick={this.onClickEdit} />
+        <img className="LiImgEmp" src={deleteImg} alt="Delete" onClick={this.onClickDelete} />
       </span>
     </li>
   )
@@ -40,8 +40,13 @@ class Employee extends PureComponent {
 }
 
 Employee.propTypes = {
+  employeeObj: PropTypes.object,
   remove: PropTypes.func.isRequired,
   edit: PropTypes.func.isRequired,
+};
+
+Employee.defaultProps = {
+  employeeObj: {},
 };
 
 export default Employee;

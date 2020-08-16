@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import { defaultMemoize } from 'reselect';
 import PropTypes from 'prop-types';
 import './Pagination.css';
 import PageNumber from './PageNumber/PageNumber';
@@ -17,7 +18,7 @@ class Pagination extends PureComponent {
     return paginate(number);
   }
 
-    getPagination = (itemsPerPage, totalItems, paginate, activePage) => {
+    getPagination = defaultMemoize((itemsPerPage, totalItems, activePage) => {
       const pageNumbers = [];
 
       for (let i = 1; i <= Math.ceil(totalItems / itemsPerPage); i += 1) {
@@ -40,12 +41,12 @@ class Pagination extends PureComponent {
             }
         </ul>
       );
-    }
+    });
 
     render() {
       const { activePage } = this.state;
-      const { itemsPerPage, totalItems, paginate } = this.props;
-      return this.getPagination(itemsPerPage, totalItems, paginate, activePage);
+      const { itemsPerPage, totalItems } = this.props;
+      return this.getPagination(itemsPerPage, totalItems, activePage);
     }
 }
 

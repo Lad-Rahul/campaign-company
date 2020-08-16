@@ -9,12 +9,12 @@ export const fetchEmployeeDataNext = (data) => ({
 export const fetchEmployeeData = () => (dispatch) => {
   axios
     .get('https://reqres.in/api/users')
-    .then((responce) => {
-      if (responce.status === 200) {
+    .then((responce0) => {
+      if (responce0.status === 200) {
         const axiosList = [];
-        const pages = responce.data.total_pages;
+        const pages = responce0.data.total_pages;
 
-        for (let i = 1; i <= pages; i++) {
+        for (let i = 1; i <= pages; i += 1) {
           axiosList.push(axios.get(`https://reqres.in/api/users?page=${i}`));
         }
 
@@ -23,13 +23,14 @@ export const fetchEmployeeData = () => (dispatch) => {
             let processedResponces = [];
             responces.map((responce) => {
               processedResponces = [...processedResponces, ...responce.data.data];
+              return responce;
             });
             dispatch(fetchEmployeeDataNext(processedResponces));
           }).catch((error) => {
             console.log(error);
           });
       } else {
-        console.log(responce);
+        console.log(responce0);
       }
     })
     .catch((error) => {
@@ -42,7 +43,9 @@ export const deleteEmployeeDataNext = (id1) => ({
   id: id1,
 });
 
+
 export const deleteEmployeeData = (id) => (dispatch) => {
+  
   axios.delete(`https://reqres.in/api/users/${id}`)
     .then((responce) => {
       if (responce.status === 204) {
@@ -69,7 +72,9 @@ export const submitEditEmployeeDataNext = (obj) => ({
   avatar: obj.avatar,
 });
 
+
 export const submitEditEmployeeData = (obj) => {
+  
   const newobj = {
     first_name: obj.first_name,
     last_name: obj.last_name,

@@ -3,6 +3,7 @@ import { Route, NavLink, Switch } from 'react-router-dom';
 import './Home.css';
 import CampaignList from '../CampaignList/CampaignList';
 import EmployeeList from '../EmployeeList/EmployeeList';
+import * as Constants from '../../constants';
 
 class Home extends PureComponent {
   render() {
@@ -16,7 +17,7 @@ class Home extends PureComponent {
                   to="/campaignlist"
                   exact
                 >
-                  Campaign List
+                  {Constants.CAMPAIGN_LIST}
                 </NavLink>
               </li>
               <li>
@@ -24,7 +25,7 @@ class Home extends PureComponent {
                   to="/employeelist"
                   exact
                 >
-                  Employee List
+                  {Constants.EMPLOYEE_LIST}
                 </NavLink>
               </li>
             </ul>

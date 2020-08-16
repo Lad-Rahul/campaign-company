@@ -1,3 +1,5 @@
+import _map from 'lodash/map';
+import _findIndex from 'lodash/findIndex';
 import * as actionTypes from '../actionTypes';
 import data from '../../data/data.json';
 
@@ -32,7 +34,7 @@ const getCurrentTime = () => {
 const campaignReducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.FETCH_DATA: {
-      const storedData = data.map((obj) => ({
+      const storedData = _map(data, (obj) => ({
         // eslint-disable-next-line no-underscore-dangle
         id: obj._id,
         name: obj.name,
@@ -49,7 +51,7 @@ const campaignReducer = (state = initialState, action) => {
 
     case actionTypes.DELETE_DATA: {
       const checkId = (obj) => (obj.id === action.id);
-      const index = state.campaignList.findIndex(checkId);
+      const index = _findIndex(state.campaignList, checkId);
 
       const newList = [...state.campaignList];
       newList.splice(index, 1);
@@ -60,7 +62,7 @@ const campaignReducer = (state = initialState, action) => {
     }
 
     case actionTypes.EDIT_CLICKED: {
-      const newList = state.campaignList.map((obj) => {
+      const newList = _map(state.campaignList, (obj) => {
         if (obj.id === action.id) {
           return {
             ...obj,
@@ -88,8 +90,8 @@ const campaignReducer = (state = initialState, action) => {
     }
 
     case actionTypes.CHANGE_CHECKBOX_STATUS: {
-      const checkId = (obj) => (obj.id === action.id);
-      const index = state.campaignList.findIndex(checkId);
+      const checkId = ({ id }) => (id === action.id);
+      const index = _findIndex(state.campaignList, checkId);
 
       const newList = [...state.campaignList];
       const newobj = { ...newList[index] };
@@ -112,11 +114,11 @@ const campaignReducer = (state = initialState, action) => {
     case actionTypes.SUBMIT_EDIT: {
       const newList = [...state.campaignList];
 
-      action.updatedList.map((obj) => {
+      _map(action.updatedList, (obj) => {
         const currentTime = getCurrentTime();
 
         const checkId = (obj1) => (obj1.id === obj.id);
-        const index = newList.findIndex(checkId);
+        const index = _findIndex(newList, checkId);
         const newobj = { ...newList[index] };
 
         newobj.name = obj.name;

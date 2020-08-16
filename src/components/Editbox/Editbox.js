@@ -1,8 +1,11 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { PureComponent } from 'react';
+import _map from 'lodash/map';
+import { defaultMemoize } from 'reselect';
 import PropTypes from 'prop-types';
 import InputEditbox from './InputEditbox/InputEditbox';
 import './Editbox.css';
+import * as Constants from '../../constants';
 
 class Editbox extends PureComponent {
   constructor(props) {
@@ -13,10 +16,10 @@ class Editbox extends PureComponent {
     };
   }
 
-  onChangeHandler = (event, id, inputbox) => {
+  onChangeHandler = defaultMemoize((event, id, inputbox) => {
     let valid = true;
     const { editedItems } = this.state;
-    const updatedItems = editedItems.map((data) => {
+    const updatedItems = _map(editedItems, (data) => {
       if (data.id === id && inputbox === 'name') {
         if (event.target.value.trim() === '') {
           valid = false;
@@ -46,7 +49,7 @@ class Editbox extends PureComponent {
       };
     });
     this.setState({ editedItems: updatedItems, isValid: valid });
-  };
+  });
 
   onSubmitEdit = () => {
     const { editedItems } = this.state;
@@ -55,7 +58,7 @@ class Editbox extends PureComponent {
     return submitEdit(editedItems);
   };
 
-  getEditList = (editedItems) => editedItems.map((data) => (
+  getEditList = defaultMemoize((editedItems) => _map(editedItems, (data) => (
     <InputEditbox
       key={data.id}
       nameInput={data.name}
@@ -63,45 +66,42 @@ class Editbox extends PureComponent {
       id={data.id}
       change={this.onChangeHandler}
     />
+  )));
+
+  getButtons = defaultMemoize((cancelEdit, isValid) => (
+    <div>
+      <input
+        className="ButtonEditbox SubmitBtn"
+        type="button"
+        value="Submit"
+        onClick={this.onSubmitEdit}
+        disabled={!isValid}
+      />
+      <input
+        className="ButtonEditbox CancelBtn"
+        type="button"
+        value="cancel"
+        onClick={cancelEdit}
+      />
+    </div>
   ));
 
-  getButtons = (cancelEdit) => {
-    const { isValid } = this.state;
-    return (
-      <div>
-        <input
-          className="ButtonEditbox SubmitBtn"
-          type="button"
-          value="Submit"
-          onClick={this.onSubmitEdit}
-          disabled={!isValid}
-        />
-        <input
-          className="ButtonEditbox CancelBtn"
-          type="button"
-          value="cancel"
-          onClick={cancelEdit}
-        />
-      </div>
-    );
-  };
-
-  getEditbox = () => {
-    const { editedItems } = this.state;
-    const { cancelEdit } = this.props;
+  getEditbox = defaultMemoize((editedItems, cancelEdit, isValid) => {
     if (editedItems.length === 0) {
-      return (<p>No Items Selected</p>);
+      return (<p><strong>{Constants.NOT_SELECTED}</strong></p>);
     }
     return (
       <div className="Editbox">
         {this.getEditList(editedItems)}
-        {this.getButtons(cancelEdit)}
+        {this.getButtons(cancelEdit, isValid)}
       </div>
     );
-  };
+  });
 
   render() {
-    return this.getEditbox();
+    const { editedItems, isValid } = this.state;
+    const { cancelEdit } = this.props;
+    return this.getEditbox(editedItems, cancelEdit, isValid);
   }
 }
 

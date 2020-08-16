@@ -2,8 +2,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import './Campaign.css';
-import { editImg } from '../../assets/image/edit_image.png';
-import { deleteImg } from '../../assets/image/delete_image.png';
+import editImg from '../../../assets/image/edit_image.png';
+import deleteImg from '../../../assets/image/delete_image.png';
 
 class Campaign extends PureComponent {
     onClickDelete = () => {
@@ -46,9 +46,13 @@ class Campaign extends PureComponent {
 }
 
 Campaign.propTypes = {
+  campaignObj: PropTypes.object,
   remove: PropTypes.func.isRequired,
   edit: PropTypes.func.isRequired,
   change: PropTypes.func.isRequired,
 };
 
+Campaign.defaultProps = {
+  campaignObj: {},
+};
 export default Campaign;

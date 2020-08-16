@@ -1,5 +1,8 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { PureComponent } from 'react';
+import _map from 'lodash/map';
+import _filter from 'lodash/filter';
+import { defaultMemoize } from 'reselect';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as actionCreaters from '../../store/actions';
@@ -7,39 +10,47 @@ import Employee from './Employee/Employee';
 import Pagination from '../Pagination/Pagination';
 import Modal from '../Modal/Modal';
 import EditEmployee from '../EditEmployee/EditEmployee';
+import * as Constants from '../../constants';
 import './EmployeeList.css';
 
 class EmployeeList extends PureComponent {
+  showTotal = defaultMemoize((totalEmployees) => <p className="Total">{Constants.TOTAL_EMPLOYEES + totalEmployees}</p>);
+
   constructor(props) {
     super(props);
-    const { onFetchEmployeeData } = this.props;
-    onFetchEmployeeData();
+
     this.state = {
       currentPage: 1,
       itemsPerPage: 3,
     };
   }
 
+  componentDidMount() {
+    const { onFetchEmployeeData } = this.props;
+    onFetchEmployeeData();
+  }
+
   getHeadingEmp = () => (
     <div className="ListHeadingEmp">
       <div className="HeadingItemsEmp">
-        <span className="HeadingFirstName">First Name</span>
-        <span className="HeadingLastName">Last Name</span>
-        <span className="HeadingEmail">Email</span>
-        <span className="HeadingAvatar">Profile Picture</span>
-        <span className="HeadingAction">Actions</span>
+        <span className="HeadingFirstName">{Constants.FIRST_NAME}</span>
+        <span className="HeadingLastName">{Constants.LAST_NAME}</span>
+        <span className="HeadingEmail">{Constants.EMAIL}</span>
+        <span className="HeadingAvatar">{Constants.PROFILE_PICTURE}</span>
+        <span className="HeadingAction">{Constants.ACTIONS}</span>
       </div>
     </div>
-  )
+  );
 
-  getEmployeeList = (currentCampaignList, onDeleteEmployeeData, onEditEmployeeData) => {
-    if (!currentCampaignList || currentCampaignList.length === 0) {
-      return (<p><strong>Not found!</strong></p>);
-    }
-    return (
-      <ul className="ListItemsEmp">
-        {
-          currentCampaignList.map((obj) => (
+  getEmployeeList = defaultMemoize(
+    (currentEmployeeList, onDeleteEmployeeData, onEditEmployeeData) => {
+      if (!currentEmployeeList || currentEmployeeList.length === 0) {
+        return (<p><strong>{Constants.NOT_FOUND}</strong></p>);
+      }
+      return (
+        <ul className="ListItemsEmp">
+          {
+          _map(currentEmployeeList, (obj) => (
             <Employee
               key={obj.id}
               employeeObj={obj}
@@ -48,21 +59,22 @@ class EmployeeList extends PureComponent {
             />
           ))
         }
-      </ul>
-    );
-  }
+        </ul>
+      );
+    },
+  )
 
-  paginate = (pageNo) => {
-    this.setState({ currentPage: pageNo });
-  }
-
-  getPagination = (itemsPerPage, total) => (
+  getPagination = defaultMemoize((itemsPerPage, total) => (
     <Pagination
       itemsPerPage={itemsPerPage}
       totalItems={total}
       paginate={this.paginate}
     />
-  );
+  ));
+
+  paginate = (pageNo) => {
+    this.setState({ currentPage: pageNo });
+  }
 
   getModal = (
     currentEmployeeList,
@@ -73,7 +85,7 @@ class EmployeeList extends PureComponent {
   ) => (
     <Modal show={isEdit} close={onCancelEditEmployeeData}>
       <EditEmployee
-        editObj={currentEmployeeList.filter((obj) => (obj.id === selectedEdit))[0]}
+        editObj={_filter(currentEmployeeList, (obj) => (obj.id === selectedEdit))[0]}
         submitEdit={onSubmitEditEmployeeData}
         cancelEdit={onCancelEditEmployeeData}
       />
@@ -92,18 +104,19 @@ class EmployeeList extends PureComponent {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentEmployeeList = employeeList.slice(indexOfFirstItem, indexOfLastItem);
     return (
-      <div>
-        {this.getHeadingEmp()}
-        {this.getEmployeeList(currentEmployeeList, onDeleteEmployeeData, onEditEmployeeData)}
-        {this.getPagination(itemsPerPage, employeeList.length)}
-        {this.getModal(
-          currentEmployeeList,
-          isEdit,
-          selectedEdit,
-          onSubmitEditEmployeeData,
-          onCancelEditEmployeeData,
-        )}
-      </div>
+        <div>
+          {this.showTotal(employeeList.length)}
+          {this.getHeadingEmp()}
+          {this.getEmployeeList(currentEmployeeList, onDeleteEmployeeData, onEditEmployeeData)}
+          {this.getPagination(itemsPerPage, employeeList.length)}
+          {this.getModal(
+            currentEmployeeList,
+            isEdit,
+            selectedEdit,
+            onSubmitEditEmployeeData,
+            onCancelEditEmployeeData,
+          )}
+        </div>
     );
   }
 }
@@ -124,6 +137,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 EmployeeList.propTypes = {
   isEdit: PropTypes.bool,
+  selectedEdit: PropTypes.number,
   employeeList: PropTypes.array.isRequired,
   onFetchEmployeeData: PropTypes.func.isRequired,
   onDeleteEmployeeData: PropTypes.func.isRequired,
@@ -134,6 +148,7 @@ EmployeeList.propTypes = {
 
 EmployeeList.defaultProps = {
   isEdit: false,
+  selectedEdit: null,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EmployeeList);

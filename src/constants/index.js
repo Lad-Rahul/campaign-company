@@ -1,0 +1,14 @@
+export const NOT_FOUND = 'Not found!';
+export const FIRST_NAME = 'First name';
+export const LAST_NAME = 'Last name';
+export const EMAIL = 'Email';
+export const PROFILE_PICTURE = 'Profile Picture';
+export const PROFILE_PIC_URL = 'Profile Picture URL: ';
+export const CAMPAIGN_NAME = 'Campaign Name';
+export const TYPE = 'Type';
+export const LAST_SAVED = 'Last Saved';
+export const ACTIONS = 'Actions';
+export const NOT_SELECTED = 'No items have been selected';
+export const CAMPAIGN_LIST = 'Campaign List';
+export const EMPLOYEE_LIST = 'Employee List';
+export const TOTAL_EMPLOYEES = 'Total Employees: ';

@@ -1,18 +1,34 @@
 /* eslint-disable react/forbid-prop-types */
 import React, { PureComponent } from 'react';
+import _filter from 'lodash/filter';
+import _map from 'lodash/map';
+import { defaultMemoize } from 'reselect';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as actionCreaters from '../../store/actions';
-import Campaign from '../Campaign/Campaign';
-
+import Campaign from './Campaign/Campaign';
 import Searchbar from '../Searchbar/Searchbar';
 import './CampaignList.css';
 import Pagination from '../Pagination/Pagination';
 import Modal from '../Modal/Modal';
 import Editbox from '../Editbox/Editbox';
-import { editImg } from '../../assets/image/edit_image.png';
+import editImg from '../../assets/image/edit_image.png';
+import * as Constants from '../../constants';
 
 class CampaignList extends PureComponent {
+  applyfilter = defaultMemoize((campaignList, searchQuery) => {
+    if (!searchQuery) return campaignList;
+    const newList = _filter(campaignList, (obj) => {
+      const name = obj.name.toLowerCase();
+      const type = obj.type.toLowerCase();
+      const qry = searchQuery.toLowerCase();
+      if (name.includes(qry)) return true;
+      if (type.includes(qry)) return true;
+      return false;
+    });
+    return newList;
+  });
+
   constructor(props) {
     super(props);
     const { onFetchData } = this.props;
@@ -26,47 +42,31 @@ class CampaignList extends PureComponent {
 
   onClickSearch = (query) => {
     this.setState({ searchQuery: query.trim() });
-  }
+  };
 
-  applyfilter = (chempaignList, searchQuery) => {
-    if (!searchQuery) return chempaignList;
-
-    const newList = chempaignList.filter((obj) => {
-      const name = obj.name.toLowerCase();
-      const type = obj.type.toLowerCase();
-      const qry = searchQuery.toLowerCase();
-      if (name.includes(qry)) return true;
-      if (type.includes(qry)) return true;
-      return false;
-    });
-
-    return newList;
-  }
-
-  getHeading = (onClickMultipleEdit) => (
+  getHeading = defaultMemoize((onClickMultipleEdit) => (
     <div className="ListHeading">
       <div className="HeadingItems">
         <span className="HeadingCheckbox">
-          <span onClick={onClickMultipleEdit} className="span">
-            <img src={editImg} className="EditImg1" alt="EDIT Selected" />
-          </span>
+          <img src={editImg} onClick={onClickMultipleEdit} className="EditImgMultiple" alt="EDIT Selected" />
         </span>
-        <span className="HeadingName">Campaign Name</span>
-        <span className="HeadingType">Type</span>
-        <span className="HeadingTime">Last saved</span>
-        <span className="HeadingAction">Actions</span>
+        <span className="HeadingName">{Constants.CAMPAIGN_NAME}</span>
+        <span className="HeadingType">{Constants.TYPE}</span>
+        <span className="HeadingTime">{Constants.LAST_SAVED}</span>
+        <span className="HeadingAction">{Constants.ACTIONS}</span>
       </div>
     </div>
-  )
+  ));
 
-  getCampaignList = (currentCampaignList, onDeleteData, onClickEditData, onChangeCheckbox) => {
-    if (!currentCampaignList || currentCampaignList.length === 0) {
-      return (<p><strong>Not found!</strong></p>);
-    }
-    return (
-      <ul className="ListItems">
-        {
-          currentCampaignList.map((obj) => (
+  getCampaignList = defaultMemoize(
+    (currentCampaignList, onDeleteData, onClickEditData, onChangeCheckbox) => {
+      if (!currentCampaignList || currentCampaignList.length === 0) {
+        return (<p><strong>{Constants.NOT_FOUND}</strong></p>);
+      }
+      return (
+        <ul className="ListItems">
+          {
+          _map(currentCampaignList, (obj) => (
             <Campaign
               key={obj.id}
               campaignObj={obj}
@@ -76,31 +76,32 @@ class CampaignList extends PureComponent {
             />
           ))
         }
-      </ul>
-    );
-  }
+        </ul>
+      );
+    },
+  );
 
-  paginate = (pageNo) => {
-    this.setState({ currentPage: pageNo });
-  }
-
-  getPagination = (itemsPerPage, total) => (
+  getPagination = defaultMemoize((itemsPerPage, total) => (
     <Pagination
       itemsPerPage={itemsPerPage}
       totalItems={total}
       paginate={this.paginate}
     />
-  );
+  ));
 
-  getModal = (currentCampaignList, isEdit, onClickSubmitEdit, onClickCancelEdit) => (
+  getModal = defaultMemoize((currentCampaignList, isEdit, onClickSubmitEdit, onClickCancelEdit) => (
     <Modal show={isEdit} close={onClickCancelEdit}>
       <Editbox
-        editList={currentCampaignList.filter((obj) => (obj.isChecked === true))}
+        editList={_filter(currentCampaignList, (obj) => (obj.isChecked === true))}
         submitEdit={onClickSubmitEdit}
         cancelEdit={onClickCancelEdit}
       />
     </Modal>
-  )
+  ));
+
+  paginate = (pageNo) => {
+    this.setState({ currentPage: pageNo });
+  }
 
   render() {
     const {
@@ -149,6 +150,7 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 CampaignList.propTypes = {
+  campaignList: PropTypes.array,
   isEdit: PropTypes.bool.isRequired,
   onFetchData: PropTypes.func.isRequired,
   onDeleteData: PropTypes.func.isRequired,
@@ -160,6 +162,7 @@ CampaignList.propTypes = {
 };
 
 CampaignList.defaultProps = {
+  campaignList: [],
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(CampaignList);
