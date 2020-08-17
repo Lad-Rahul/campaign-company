@@ -8,6 +8,7 @@ class Searchbar extends PureComponent {
     super(props);
     this.state = {
       query: '',
+      timeout: 0,
     };
   }
 

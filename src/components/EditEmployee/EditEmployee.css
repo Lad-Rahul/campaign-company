@@ -33,15 +33,18 @@
   .SubmitBtn {
     color: green;
     border: 1px solid green;
+    cursor: pointer;
   }
   
   .SubmitBtn:disabled {
       color: #ccc;
       border: 1px solid #ccc;
+      cursor: not-allowed;
   }
   
   .CancelBtn {
     color: red;
     border: 1px solid green;
+    cursor: pointer;
   }
   

@@ -5,17 +5,10 @@ import './Pagination.css';
 import PageNumber from './PageNumber/PageNumber';
 
 class Pagination extends PureComponent {
-  constructor(props) {
-    super(props);
-    this.state = {
-      activePage: 1,
-    };
-  }
 
-  setActivePageAndPaginate = (number) => {
-    const { paginate } = this.props;
-    this.setState({ activePage: number });
-    return paginate(number);
+  setActivePageAndPaginate = (pageNumber) => {
+    const { paginate, itemsPerPage } = this.props;
+    return paginate(pageNumber, itemsPerPage);
   }
 
     getPagination = defaultMemoize((itemsPerPage, totalItems, activePage) => {
@@ -44,13 +37,14 @@ class Pagination extends PureComponent {
     });
 
     render() {
-      const { activePage } = this.state;
+      const { activePage } = this.props;
       const { itemsPerPage, totalItems } = this.props;
       return this.getPagination(itemsPerPage, totalItems, activePage);
     }
 }
 
 Pagination.propTypes = {
+  activePage: PropTypes.number.isRequired,
   itemsPerPage: PropTypes.number.isRequired,
   totalItems: PropTypes.number.isRequired,
   paginate: PropTypes.func.isRequired,

@@ -29,6 +29,8 @@ class CampaignList extends PureComponent {
     return newList;
   });
 
+  showTotal = defaultMemoize((totalCampaigns) => <p className="Total">{Constants.TOTAL + totalCampaigns}</p>);
+
   constructor(props) {
     super(props);
     const { onFetchData } = this.props;
@@ -81,11 +83,12 @@ class CampaignList extends PureComponent {
     },
   );
 
-  getPagination = defaultMemoize((itemsPerPage, total) => (
+  getPagination = defaultMemoize((currentPage, itemsPerPage, total) => (
     <Pagination
       itemsPerPage={itemsPerPage}
       totalItems={total}
       paginate={this.paginate}
+      activePage={currentPage}
     />
   ));
 
@@ -125,9 +128,10 @@ class CampaignList extends PureComponent {
     return (
       <div className="CampaignList">
         <Searchbar search={this.onClickSearch} />
+        {this.showTotal(campaignList.length)}
         {this.getHeading(onClickMultipleEdit)}
         {this.getCampaignList(currentCampaignList, onDeleteData, onClickEditData, onChangeCheckbox)}
-        {this.getPagination(itemsPerPage, filteredCampaignList.length)}
+        {this.getPagination(currentPage, itemsPerPage, filteredCampaignList.length)}
         {this.getModal(currentCampaignList, isEdit, onClickSubmitEdit, onClickCancelEdit)}
       </div>
     );

@@ -24,6 +24,10 @@ const getCurrentTime = () => {
     hr -= 12;
     ampm = 'pm';
   }
+  if (hr === 12) {
+    ampm = 'pm';
+  }
+
   const date = d.getDate();
   const month = months[d.getMonth()];
   const year = d.getFullYear();
@@ -34,12 +38,13 @@ const getCurrentTime = () => {
 const campaignReducer = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.FETCH_DATA: {
+      const currTime = getCurrentTime();
       const storedData = _map(data, (obj) => ({
         // eslint-disable-next-line no-underscore-dangle
         id: obj._id,
         name: obj.name,
         type: obj.type,
-        lastSaved: 'Fri 14 Aug 2020 00:00am',
+        lastSaved: currTime,
         isChecked: false,
       }));
 

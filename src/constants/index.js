@@ -12,3 +12,4 @@ export const NOT_SELECTED = 'No items have been selected';
 export const CAMPAIGN_LIST = 'Campaign List';
 export const EMPLOYEE_LIST = 'Employee List';
 export const TOTAL_EMPLOYEES = 'Total Employees: ';
+export const TOTAL = 'Total: ';

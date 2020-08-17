@@ -10,24 +10,17 @@ import Employee from './Employee/Employee';
 import Pagination from '../Pagination/Pagination';
 import Modal from '../Modal/Modal';
 import EditEmployee from '../EditEmployee/EditEmployee';
+import Loader from '../Loader/Loader';
 import * as Constants from '../../constants';
 import './EmployeeList.css';
 
 class EmployeeList extends PureComponent {
   showTotal = defaultMemoize((totalEmployees) => <p className="Total">{Constants.TOTAL_EMPLOYEES + totalEmployees}</p>);
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      currentPage: 1,
-      itemsPerPage: 3,
-    };
-  }
-
   componentDidMount() {
     const { onFetchEmployeeData } = this.props;
-    onFetchEmployeeData();
+    const { currentPage, itemsPerPage } = this.props;
+    onFetchEmployeeData(currentPage, itemsPerPage);
   }
 
   getHeadingEmp = () => (
@@ -64,17 +57,14 @@ class EmployeeList extends PureComponent {
     },
   )
 
-  getPagination = defaultMemoize((itemsPerPage, total) => (
+  getPagination = defaultMemoize((currentPage, itemsPerPage, total, onFetchEmployeeData) => (
     <Pagination
       itemsPerPage={itemsPerPage}
       totalItems={total}
-      paginate={this.paginate}
+      paginate={onFetchEmployeeData}
+      activePage={currentPage}
     />
   ));
-
-  paginate = (pageNo) => {
-    this.setState({ currentPage: pageNo });
-  }
 
   getModal = (
     currentEmployeeList,
@@ -93,30 +83,31 @@ class EmployeeList extends PureComponent {
   )
 
   render() {
-    const { currentPage, itemsPerPage } = this.state;
+    const { currentPage, itemsPerPage } = this.props;
     const {
-      employeeList, isEdit, selectedEdit, onDeleteEmployeeData, onEditEmployeeData,
-      onSubmitEditEmployeeData, onCancelEditEmployeeData,
+      onFetchEmployeeData, employeeList, isEdit, selectedEdit, totalEmployees, isLoading, onDeleteEmployeeData, onEditEmployeeData,
+      onSubmitEditEmployeeData, onCancelEditEmployeeData, isError, error,
     } = this.props;
-    // console.log(employeeList);
 
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentEmployeeList = employeeList.slice(indexOfFirstItem, indexOfLastItem);
+    const currentEmployeeList = employeeList;
+    if (isLoading) return <Loader />;
+
+    if (isError) return <p>{error}</p>;
+
     return (
-        <div>
-          {this.showTotal(employeeList.length)}
-          {this.getHeadingEmp()}
-          {this.getEmployeeList(currentEmployeeList, onDeleteEmployeeData, onEditEmployeeData)}
-          {this.getPagination(itemsPerPage, employeeList.length)}
-          {this.getModal(
-            currentEmployeeList,
-            isEdit,
-            selectedEdit,
-            onSubmitEditEmployeeData,
-            onCancelEditEmployeeData,
-          )}
-        </div>
+      <div>
+        {this.showTotal(totalEmployees)}
+        {this.getHeadingEmp()}
+        {this.getEmployeeList(currentEmployeeList, onDeleteEmployeeData, onEditEmployeeData)}
+        {this.getPagination(currentPage, itemsPerPage, totalEmployees, onFetchEmployeeData)}
+        {this.getModal(
+          currentEmployeeList,
+          isEdit,
+          selectedEdit,
+          onSubmitEditEmployeeData,
+          onCancelEditEmployeeData,
+        )}
+      </div>
     );
   }
 }
@@ -124,11 +115,17 @@ class EmployeeList extends PureComponent {
 const mapStateToProps = (state) => ({
   employeeList: state.employee.employeeList,
   isEdit: state.employee.isEdit,
+  totalEmployees: state.employee.totalEmployees,
   selectedEdit: state.employee.selectedEdit,
+  isLoading: state.employee.isLoading,
+  currentPage: state.employee.currentPage,
+  itemsPerPage: state.employee.itemsPerPage,
+  isError: state.employee.isError,
+  error: state.employee.error,
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  onFetchEmployeeData: () => dispatch(actionCreaters.fetchEmployeeData()),
+  onFetchEmployeeData: (currentPage, itemsPerPage) => dispatch(actionCreaters.fetchEmployeeData(currentPage, itemsPerPage)),
   onDeleteEmployeeData: (id) => dispatch(actionCreaters.deleteEmployeeData(id)),
   onEditEmployeeData: (id) => dispatch(actionCreaters.editEmployeeData(id)),
   onSubmitEditEmployeeData: (obj) => dispatch(actionCreaters.submitEditEmployeeData(obj)),
@@ -138,7 +135,13 @@ const mapDispatchToProps = (dispatch) => ({
 EmployeeList.propTypes = {
   isEdit: PropTypes.bool,
   selectedEdit: PropTypes.number,
-  employeeList: PropTypes.array.isRequired,
+  isLoading: PropTypes.bool,
+  totalEmployees: PropTypes.number,
+  currentPage: PropTypes.number,
+  itemsPerPage: PropTypes.number,
+  employeeList: PropTypes.array,
+  isError: PropTypes.bool,
+  error: PropTypes.string,
   onFetchEmployeeData: PropTypes.func.isRequired,
   onDeleteEmployeeData: PropTypes.func.isRequired,
   onEditEmployeeData: PropTypes.func.isRequired,
@@ -147,8 +150,15 @@ EmployeeList.propTypes = {
 };
 
 EmployeeList.defaultProps = {
+  employeeList: [],
   isEdit: false,
   selectedEdit: null,
+  isLoading: false,
+  totalEmployees: 0,
+  currentPage: 1,
+  itemsPerPage: 3,
+  isError: false,
+  error: '',
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(EmployeeList);

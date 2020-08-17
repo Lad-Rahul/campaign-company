@@ -4,6 +4,12 @@ const initialState = {
   employeeList: [],
   isEdit: false,
   selectedEdit: null,
+  isLoading: false,
+  totalEmployees: 0,
+  currentPage: 1,
+  itemsPerPage: 3,
+  isError: false,
+  error: '',
 };
 
 const employeeReducer = (state = initialState, action) => {
@@ -19,6 +25,26 @@ const employeeReducer = (state = initialState, action) => {
       return {
         ...state,
         employeeList: fetchedData,
+        totalEmployees: action.total,
+        isLoading: false,
+        currentPage: action.currentPage,
+        itemsPerPage: action.itemsPerPage,
+      };
+    }
+
+    case actionTypes.SET_LOADING_STATUS: {
+      return {
+        ...state,
+        isLoading: action.loading,
+      };
+    }
+
+    case actionTypes.DISPLAY_ERROR: {
+      return {
+        ...state,
+        isError: true,
+        error: action.error.toString(),
+        isLoading: false,
       };
     }
 
@@ -32,6 +58,8 @@ const employeeReducer = (state = initialState, action) => {
       return {
         ...state,
         employeeList: newList,
+        isLoading: false,
+        totalEmployees: state.totalEmployees - 1,
       };
     }
 
@@ -61,6 +89,7 @@ const employeeReducer = (state = initialState, action) => {
         ...state,
         employeeList: newList,
         isEdit: false,
+        isLoading: false,
       };
     }
 

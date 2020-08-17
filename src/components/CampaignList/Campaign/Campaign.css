@@ -8,6 +8,7 @@
 .LiCheckbox{
     flex:2;
     text-align: left;
+    cursor: pointer;
 }
 
 .LiName{
@@ -34,4 +35,5 @@
     width:20px;
     height:20px;
     margin: 0 0.4rem;
+    cursor: pointer;
 }

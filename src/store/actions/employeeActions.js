@@ -1,40 +1,33 @@
 import axios from 'axios';
 import * as actionTypes from '../actionTypes';
 
-export const fetchEmployeeDataNext = (data) => ({
+export const fetchEmployeeDataNext = (data, currentPage1, itemsPerPage1) => ({
   type: actionTypes.FETCH_EMPLOYEE_DATA,
-  payload: data,
+  payload: data.data,
+  total: data.total,
+  currentPage: currentPage1,
+  itemsPerPage: itemsPerPage1,
 });
 
-export const fetchEmployeeData = () => (dispatch) => {
+export const changeLoadingStatus = (value) => ({
+  type: actionTypes.SET_LOADING_STATUS,
+  loading: value,
+});
+
+export const displayError = (error1) => ({
+  type: actionTypes.DISPLAY_ERROR,
+  error: error1,
+});
+
+export const fetchEmployeeData = (currentPage, itemsPerPage) => (dispatch) => {
+  dispatch(changeLoadingStatus(true));
   axios
-    .get('https://reqres.in/api/users')
-    .then((responce0) => {
-      if (responce0.status === 200) {
-        const axiosList = [];
-        const pages = responce0.data.total_pages;
-
-        for (let i = 1; i <= pages; i += 1) {
-          axiosList.push(axios.get(`https://reqres.in/api/users?page=${i}`));
-        }
-
-        Promise.all(axiosList)
-          .then((responces) => {
-            let processedResponces = [];
-            responces.map((responce) => {
-              processedResponces = [...processedResponces, ...responce.data.data];
-              return responce;
-            });
-            dispatch(fetchEmployeeDataNext(processedResponces));
-          }).catch((error) => {
-            console.log(error);
-          });
-      } else {
-        console.log(responce0);
-      }
+    .get(`https://reqres.in/api/users?per_page=${itemsPerPage}?&page=${currentPage}`)
+    .then((responce) => {
+      dispatch(fetchEmployeeDataNext(responce.data, currentPage, itemsPerPage));
     })
     .catch((error) => {
-      console.log(error);
+      dispatch(displayError(error));
     });
 };
 
@@ -43,18 +36,15 @@ export const deleteEmployeeDataNext = (id1) => ({
   id: id1,
 });
 
-
 export const deleteEmployeeData = (id) => (dispatch) => {
-  
+  dispatch(changeLoadingStatus(true));
   axios.delete(`https://reqres.in/api/users/${id}`)
     .then((responce) => {
       if (responce.status === 204) {
         dispatch(deleteEmployeeDataNext(id));
-      } else {
-        console.log(responce);
       }
     }).catch((error) => {
-      console.log(error);
+      dispatch(displayError(error));
     });
 };
 
@@ -72,9 +62,7 @@ export const submitEditEmployeeDataNext = (obj) => ({
   avatar: obj.avatar,
 });
 
-
 export const submitEditEmployeeData = (obj) => {
-  
   const newobj = {
     first_name: obj.first_name,
     last_name: obj.last_name,
@@ -82,16 +70,15 @@ export const submitEditEmployeeData = (obj) => {
     avatar: obj.avatar,
   };
   return (dispatch) => {
+    dispatch(changeLoadingStatus(true));
     axios.post(`https://reqres.in/api/users/${obj.id}`, newobj)
       .then((responce) => {
         if (responce.status === 201) {
           dispatch(submitEditEmployeeDataNext(obj));
           // console.log(responce);
-        } else {
-          console.log(responce);
         }
       }).catch((error) => {
-        console.log(error);
+        dispatch(displayError(error));
       });
   };
 };
