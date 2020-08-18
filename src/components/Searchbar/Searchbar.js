@@ -4,11 +4,18 @@ import './Searchbar.css';
 import { defaultMemoize } from 'reselect';
 
 class Searchbar extends PureComponent {
+  raiseSearchWhenUserStoppedTyping = debounce(
+    () => {
+      const { query } = this.state;
+      const { search } = this.props;
+      search(query);
+    }, 300,
+  );
+
   constructor(props) {
     super(props);
     this.state = {
       query: '',
-      timeout: 0,
     };
   }
 
@@ -21,6 +28,7 @@ class Searchbar extends PureComponent {
 
   onChangeSearch = (event) => {
     this.setState({ query: event.target.value });
+    this.raiseSearchWhenUserStoppedTyping();
   };
 
   getSearchbar = defaultMemoize((query) => (
