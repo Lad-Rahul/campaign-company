@@ -43,7 +43,7 @@ class CampaignList extends PureComponent {
   }
 
   onClickSearch = (query) => {
-    this.setState({ searchQuery: query.trim() });
+    this.setState({ searchQuery: query.trim(), currentPage: 1 });
   };
 
   getHeading = defaultMemoize((onClickMultipleEdit) => (
